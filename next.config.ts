@@ -12,7 +12,7 @@ function resolveApiUrl(): string {
   const value = (process.env.NEXT_PUBLIC_API_URL ?? "").trim().replace(/\/+$/, "");
   const bareRenderSite = value === "https://onrender.com" || value === "http://onrender.com";
   const local = !value || value.includes("localhost") || value.includes("127.0.0.1");
-  if (bareRenderSite || (process.env.NODE_ENV === "production" && local)) {
+  if (process.env.NODE_ENV === "production" || bareRenderSite || local) {
     return LIVE_API_URL;
   }
   return value;

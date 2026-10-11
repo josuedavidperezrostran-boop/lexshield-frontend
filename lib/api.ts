@@ -4,7 +4,7 @@ function resolveApiUrl(value: string | undefined): string {
   const trimmed = (value ?? "").trim().replace(/\/+$/, "");
   const bareRenderSite = trimmed === "https://onrender.com" || trimmed === "http://onrender.com";
   const local = !trimmed || trimmed.includes("localhost") || trimmed.includes("127.0.0.1");
-  if (bareRenderSite || (process.env.NODE_ENV === "production" && local)) {
+  if (process.env.NODE_ENV === "production" || bareRenderSite || local) {
     return LIVE_API_URL;
   }
   return trimmed;
@@ -96,9 +96,10 @@ export async function openBillingPortal(): Promise<string> {
 }
 
 export async function startCheckout(): Promise<string> {
-  const response = await fetch(`${API_URL}/billing/checkout`, {
+  const response = await fetch(`${LIVE_API_URL}/billing/checkout`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({}),
   });
   const data = await readBody(response);
   if (!response.ok) {
