@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+:root {
+  --ink: #07080c;
+  --ink-2: #0d0f14;
+  --panel: #13161c;
+  --line: rgba(198, 204, 214, 0.22);
+  --gold: #d7dde6;
+  --ivory: #f5f7fa;
+  --muted: #9aa3b2;
+  --high: #e06a62;
+  --medium: #d7b15a;
+}
+
+@theme inline {
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-panel: var(--panel);
+  --color-line: var(--line);
+  --color-gold: var(--gold);
+  --color-ivory: var(--ivory);
+  --color-muted: var(--muted);
+  --color-high: var(--high);
+  --color-medium: var(--medium);
+  --font-sans: var(--font-geist-sans);
+  --font-display: var(--font-display);
+}
+
+body {
+  min-height: 100vh;
+  background:
+    linear-gradient(180deg, rgba(215, 221, 230, 0.05), transparent 280px),
+    var(--ink);
+  color: var(--ivory);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  letter-spacing: 0.01em;
+}
+
+.font-display {
+  font-family: var(--font-display), Georgia, serif;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+::selection {
+  background: rgba(215, 221, 230, 0.28);
+  color: #07080c;
+}
