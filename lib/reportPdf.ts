@@ -7,8 +7,10 @@ const PAGE_HEIGHT = 841.89;
 const MARGIN = 48;
 
 export async function downloadAuditReport(audit: AuditResponse) {
-  const bytes = await buildAuditPdf(audit);
-  const blob = new Blob([new Uint8Array(bytes)], { type: "application/pdf" });
+  const saved = await buildAuditPdf(audit);
+  const buffer = new ArrayBuffer(saved.byteLength);
+  new Uint8Array(buffer).set(saved);
+  const blob = new Blob([buffer], { type: "application/pdf" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   const slug = (audit.filename || audit.document_title || "contrato")
