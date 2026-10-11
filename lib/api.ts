@@ -96,7 +96,7 @@ export async function openBillingPortal(): Promise<string> {
 }
 
 export async function startCheckout(): Promise<string> {
-  const response = await fetch(`${LIVE_API_URL}/billing/checkout`, {
+  const response = await fetch("https://lexshield-backend.onrender.com/billing/checkout", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({}),
