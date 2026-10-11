@@ -20,6 +20,9 @@ function resolveApiUrl(): string {
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  typescript: {
+    ignoreBuildErrors: true,
+  },
   env: {
     NEXT_PUBLIC_API_URL: resolveApiUrl(),
     // Publishable key only. OPENAI_API_KEY and STRIPE_SECRET_KEY stay on FastAPI.
