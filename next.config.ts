@@ -7,6 +7,12 @@ const projectRoot = path.resolve(__dirname, "..");
 loadEnvConfig(projectRoot);
 
 const LIVE_API_URL = "https://lexshield-backend.onrender.com";
+const DEFAULT_SITE_URL = "https://frontend-1-lex-shield2.vercel.app";
+
+function resolveSiteUrl(): string {
+  const value = (process.env.NEXT_PUBLIC_SITE_URL ?? "").trim().replace(/\/+$/, "");
+  return value || DEFAULT_SITE_URL;
+}
 
 function resolveApiUrl(): string {
   const value = (process.env.NEXT_PUBLIC_API_URL ?? "").trim().replace(/\/+$/, "");
@@ -24,6 +30,7 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true,
   },
   env: {
+    NEXT_PUBLIC_SITE_URL: resolveSiteUrl(),
     NEXT_PUBLIC_API_URL: resolveApiUrl(),
     // Publishable key only. OPENAI_API_KEY and STRIPE_SECRET_KEY stay on FastAPI.
     NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY:

@@ -1,7 +1,24 @@
+import type { Metadata } from "next";
 import { Cormorant_Garamond, Geist } from "next/font/google";
 import { ComplianceBanner } from "@/components/ComplianceBanner";
 import { copy } from "@/lib/copy";
 import "./globals.css";
+
+const DEFAULT_SITE_URL = "https://frontend-1-lex-shield2.vercel.app";
+
+function siteUrl(): URL {
+  const configured = (process.env.NEXT_PUBLIC_SITE_URL ?? "").trim().replace(/\/+$/, "");
+  return new URL(configured || DEFAULT_SITE_URL);
+}
+
+export const metadata: Metadata = {
+  metadataBase: siteUrl(),
+  title: "LexShield — Riesgo contractual, antes de que se vuelva responsabilidad",
+  description: copy.zdr,
+  alternates: {
+    canonical: "/",
+  },
+};
 
 const geist = Geist({
   variable: "--font-geist-sans",
@@ -21,10 +38,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
-      <head>
-        <title>LexShield — Riesgo contractual, antes de que se vuelva responsabilidad</title>
-        <meta name="description" content={copy.zdr} />
-      </head>
       <body className={`${geist.variable} ${display.variable} antialiased`}>
         <ComplianceBanner />
         {children}

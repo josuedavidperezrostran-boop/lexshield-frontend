@@ -90,7 +90,7 @@ export default function HomePage() {
             </div>
             <div className="flex flex-col justify-center gap-4 border-t border-line bg-panel p-8 md:border-l md:border-t-0">
               <p className="text-sm text-muted">{t.retainer}</p>
-              <p className="font-display text-6xl text-gold">$1,000</p>
+              <p className="font-display text-4xl leading-tight text-gold sm:text-5xl">{t.monthlyPrice}</p>
               <p className="text-sm text-ivory">{t.founder}</p>
               <p className="text-xs tracking-[0.18em] text-muted">{t.code}</p>
               <LegalShield label={t.checkout} />

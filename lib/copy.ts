@@ -2,7 +2,7 @@
 export const copy = {
   brandTag: "Auditor de riesgo contractual",
   openAuditor: "Abrir auditor",
-  subscribe: "Suscribirse — $1,000/mes",
+  subscribe: "Suscribirse — $100 USD / mes",
   redirecting: "Redirigiendo a Stripe…",
   eyebrow: "Inteligencia jurídica profesional",
   hero: "Vea la cláusula que le costará — antes de firmar.",
@@ -31,8 +31,9 @@ export const copy = {
   perkDraft: "— Cláusulas resaltadas y redacción alternativa",
   perkMemory: "— Procesamiento en memoria, purgado tras la auditoría",
   retainer: "Retainer mensual",
+  monthlyPrice: "$100 USD / mes",
   founder:
-    "$1,000/mes (Nivel de lanzamiento fundador: aplique el código para su primer mes a $200)",
+    "$100 USD / mes (Nivel de lanzamiento fundador: aplique el código para su primer mes a $20)",
   code: "CÓDIGO FOUNDER80",
   checkout: "Pagar con Stripe",
   checkoutFailed: "No se pudo iniciar el pago.",
@@ -54,7 +55,7 @@ export const copy = {
   gate: "Acceso por suscripción",
   gateTitle: "Se requiere LexShield Professional",
   gateBody:
-    "$1,000/mes (Nivel de lanzamiento fundador: aplique el código para su primer mes a $200). Introduzca FOUNDER80 en Stripe Checkout. Tras el pago volverá aquí con acceso.",
+    "$100 USD / mes (Nivel de lanzamiento fundador: aplique el código para su primer mes a $20). Introduzca FOUNDER80 en Stripe Checkout. Tras el pago volverá aquí con acceso.",
   proceed: "Continuar a Stripe Checkout",
   demo: "Demostración local (sin cobro)",
   workspace: "Espacio asegurado",
