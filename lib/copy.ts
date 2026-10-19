@@ -10,7 +10,7 @@ export const copy = {
     "LexShield Audit es un auditor premium de riesgo contractual. Cargue un convenio y reciba una revisión en dos paneles de la exposición alta y media.",
   start: "Iniciar Professional",
   already: "Ya estoy suscrito",
-  pillarZdr: "Retención cero",
+  pillarZdr: "Procesamiento en memoria",
   pillarScan: "Revisión de nivel counsel",
   pillarScanBody:
     "El modelo revisa indemnidad, topes de responsabilidad, terminación, propiedad intelectual, confidencialidad, renovación automática y riesgos comerciales afines — solo altos y medios.",
@@ -51,7 +51,7 @@ export const copy = {
   legendOmission: "Omisión Crítica",
   legendOmissionBody:
     "Cláusulas esenciales faltantes que dejan al cliente desprotegido.",
-  zdr: "Procesamiento de IA de alta velocidad y asegurado. Los documentos se procesan en memoria bajo políticas estrictas de ejecución ZDR (retención cero). Los datos se purgan de forma automática tras la auditoría. Se requiere revisión humana.",
+  zdr: "Los documentos se procesan en memoria y se eliminan automáticamente tras la auditoría. Para el análisis, el texto se envía a un proveedor de IA externo (OpenAI), que puede conservarlo temporalmente según sus políticas. Este informe es una herramienta de apoyo, no constituye asesoría legal y requiere revisión por un abogado.",
   gate: "Acceso por suscripción",
   gateTitle: "Se requiere LexShield Audit Professional",
   gateBody:
@@ -117,7 +117,7 @@ export const copy = {
   demoFailed: "La demostración local no está disponible.",
   scanFailed: "La auditoría falló.",
   privacyBanner:
-    "Certificación de Privacidad Corporativa: Procesamiento exclusivo vía API Comercial bajo políticas estrictas de Zero Data Retention (ZDR). Los documentos se ejecutan 100% en memoria volátil y están legalmente protegidos contra el entrenamiento de modelos de IA públicos.",
+    "Los documentos se procesan en memoria y se eliminan automáticamente tras la auditoría. Para el análisis, el texto se envía a un proveedor de IA externo (OpenAI), que puede conservarlo temporalmente según sus políticas. Este informe es una herramienta de apoyo, no constituye asesoría legal y requiere revisión por un abogado.",
   tabAudit: "Auditoría",
   tabCompare: "Comparador de Versiones",
   wordAnchor: "Ancla Word",

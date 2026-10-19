@@ -166,7 +166,7 @@ export async function buildAuditPdf(audit: AuditResponse): Promise<Uint8Array<Ar
     3,
   );
   write(
-    "Procesamiento en memoria bajo políticas ZDR. Los datos se purgan al terminar la auditoría.",
+    "Los documentos se procesan en memoria y se eliminan automáticamente tras la auditoría. Para el análisis, el texto se envía a un proveedor de IA externo (OpenAI), que puede conservarlo temporalmente según sus políticas. Este informe es una herramienta de apoyo, no constituye asesoría legal y requiere revisión por un abogado.",
     sans,
     8,
     mute,
