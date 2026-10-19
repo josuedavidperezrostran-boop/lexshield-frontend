@@ -7,7 +7,7 @@ export const copy = {
   eyebrow: "Inteligencia jurídica profesional",
   hero: "Vea la cláusula que le costará — antes de firmar.",
   heroBody:
-    "LexShield es un auditor premium de riesgo contractual. Cargue un convenio y reciba una revisión en dos paneles de la exposición alta y media.",
+    "LexShield Audit es un auditor premium de riesgo contractual. Cargue un convenio y reciba una revisión en dos paneles de la exposición alta y media.",
   start: "Iniciar Professional",
   already: "Ya estoy suscrito",
   pillarZdr: "Retención cero",
@@ -23,7 +23,7 @@ export const copy = {
   sampleAction:
     "Sustituya por indemnidad recíproca y un tope ligado a los honorarios pagados en los doce meses previos.",
   stripeBilling: "Facturación Stripe",
-  plan: "LexShield Professional",
+  plan: "LexShield Audit Professional",
   pricingBody:
     "Se requiere una suscripción por Stripe Checkout antes del auditor. Los datos de la tarjeta permanecen en Stripe.",
   perkScans: "— Auditorías ilimitadas de PDF y DOCX",
@@ -53,7 +53,7 @@ export const copy = {
     "Cláusulas esenciales faltantes que dejan al cliente desprotegido.",
   zdr: "Procesamiento de IA de alta velocidad y asegurado. Los documentos se procesan en memoria bajo políticas estrictas de ejecución ZDR (retención cero). Los datos se purgan de forma automática tras la auditoría. Se requiere revisión humana.",
   gate: "Acceso por suscripción",
-  gateTitle: "Se requiere LexShield Professional",
+  gateTitle: "Se requiere LexShield Audit Professional",
   gateBody:
     "$100 USD / mes (Nivel de lanzamiento fundador: aplique el código para su primer mes a $20). Introduzca FOUNDER80 en Stripe Checkout. Tras el pago volverá aquí con acceso.",
   proceed: "Continuar a Stripe Checkout",
@@ -104,7 +104,7 @@ export const copy = {
   checking: "Comprobando la suscripción…",
   cancelled: "Pago cancelado",
   noCharge: "No se realizó ningún cargo",
-  stillGated: "LexShield Professional permanece cerrado hasta completar Stripe Checkout.",
+  stillGated: "LexShield Audit Professional permanece cerrado hasta completar Stripe Checkout.",
   returnCheckout: "Volver a Stripe Checkout",
   backHome: "Volver al inicio",
   confirming: "Confirmando su retainer",

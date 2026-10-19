@@ -20,7 +20,7 @@ export async function downloadAuditReport(audit: AuditResponse) {
     .replace(/^-|-$/g, "")
     .slice(0, 60);
   link.href = url;
-  link.download = `LexShield-${slug || "informe"}.pdf`;
+  link.download = `LexShield-Audit-${slug || "informe"}.pdf`;
   link.click();
   URL.revokeObjectURL(url);
 }
@@ -73,7 +73,7 @@ export async function buildAuditPdf(audit: AuditResponse): Promise<Uint8Array<Ar
     }
   }
 
-  write("LEXSHIELD", sansBold, 9, mute, 10);
+  write("LEXSHIELD AUDIT", sansBold, 9, mute, 10);
   write("Informe ejecutivo de riesgo contractual", serif, 22, ink, 8);
   rule();
 
