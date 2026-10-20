@@ -12,6 +12,7 @@ import {
   getToken,
   openBillingPortal,
   unlockDemoAccess,
+  type AuditIntegrity,
   type AuditResponse,
   type MissingClause,
   type RiskFinding,
@@ -354,13 +355,14 @@ export default function AuditorPage() {
                   </button>
                 </header>
                 <div className="h-[calc(70vh-7rem)] space-y-4 overflow-auto p-4">
+                  {audit.integrity ? <IntegrityNotice integrity={audit.integrity} /> : null}
                   <MetadataCard audit={audit} />
                   {(audit.omissions ?? []).map((omission) => (
                     <OmissionCard key={omission.id} omission={omission} />
                   ))}
                   {audit.risks.length === 0 && (audit.omissions ?? []).length === 0 && (
-                    <p className="text-sm text-muted">
-                      {t.noRisks}
+                    <p className={audit.integrity?.status === "unreliable" ? "text-sm text-high" : "text-sm text-muted"}>
+                      {audit.integrity?.status === "unreliable" ? audit.integrity.message : t.noRisks}
                     </p>
                   )}
                   {audit.risks.map((risk) => (
@@ -405,6 +407,34 @@ function PageAware({ text }: { text: string }) {
         );
       })}
     </>
+  );
+}
+
+function IntegrityNotice({ integrity }: { integrity: AuditIntegrity }) {
+  const unreliable = integrity.status === "unreliable";
+  const needsReview = integrity.status !== "complete";
+  if (!integrity.status_label && !integrity.message && !needsReview) return null;
+  const frame = unreliable
+    ? "border-high/40 bg-high/10 text-high"
+    : needsReview
+      ? "border-medium/40 bg-medium/10 text-ivory"
+      : "border-line bg-ink text-ivory";
+  return (
+    <div className={`rounded-md border px-4 py-3 text-sm ${frame}`}>
+      {integrity.status_label ? (
+        <p className={`text-xs uppercase tracking-[0.18em] ${unreliable ? "text-high" : "text-gold"}`}>
+          {integrity.status_label}
+        </p>
+      ) : null}
+      {integrity.message ? (
+        <p className={`mt-2 leading-6 ${unreliable ? "text-high" : "text-ivory"}`}>{integrity.message}</p>
+      ) : null}
+      {needsReview ? (
+        <p className={`mt-2 text-xs uppercase tracking-[0.16em] ${unreliable ? "text-high" : "text-medium"}`}>
+          Revisión humana obligatoria.
+        </p>
+      ) : null}
+    </div>
   );
 }
 

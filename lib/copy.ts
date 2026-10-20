@@ -88,7 +88,7 @@ export const copy = {
   findingsTitle: "Acciones y cláusulas alternativas",
   preparingPdf: "Preparando PDF…",
   downloadPdf: "Descargar informe PDF",
-  noRisks: "No se identificaron riesgos altos ni medios en esta pasada.",
+  noRisks: "No se detectaron riesgos en esta pasada. No interprete esto como ausencia de riesgos. Revisión humana obligatoria.",
   metadata: "Ficha técnica",
   parties: "Partes Involucradas",
   date: "Fecha del Contrato",
