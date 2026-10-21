@@ -20,7 +20,7 @@ export async function downloadAuditReport(audit: AuditResponse) {
     .replace(/^-|-$/g, "")
     .slice(0, 60);
   link.href = url;
-  link.download = `LexShield-${slug || "informe"}.pdf`;
+  link.download = `LexShield-Audit-${slug || "informe"}.pdf`;
   link.click();
   URL.revokeObjectURL(url);
 }
@@ -73,7 +73,7 @@ export async function buildAuditPdf(audit: AuditResponse): Promise<Uint8Array<Ar
     }
   }
 
-  write("LEXSHIELD", sansBold, 9, mute, 10);
+  write("LEXSHIELD AUDIT", sansBold, 9, mute, 10);
   write("Informe ejecutivo de riesgo contractual", serif, 22, ink, 8);
   rule();
 
@@ -96,17 +96,38 @@ export async function buildAuditPdf(audit: AuditResponse): Promise<Uint8Array<Ar
 
   const high = audit.risks.filter((risk) => risk.severity === "high").length;
   const medium = audit.risks.filter((risk) => risk.severity === "medium").length;
-  write(
-    `${audit.risks.length} riesgos · ${high} altos · ${medium} medios`,
-    sans,
-    10,
-    mute,
-    14,
-  );
+  const integrity = audit.integrity;
+  const unreliable = integrity?.status === "unreliable";
+  if (!unreliable) {
+    write(
+      `${audit.risks.length} riesgos · ${high} altos · ${medium} medios`,
+      sans,
+      10,
+      mute,
+      14,
+    );
+  }
+  if (integrity) {
+    const parts: { text: string; font: typeof sans; size: number }[] = [];
+    if (integrity.status_label) parts.push({ text: integrity.status_label, font: sansBold, size: 10 });
+    if (integrity.message) parts.push({ text: integrity.message, font: serif, size: 11 });
+    if (integrity.status !== "complete") {
+      parts.push({ text: "Revisión humana obligatoria.", font: sans, size: 10 });
+    }
+    parts.forEach((part, index) => {
+      write(part.text, part.font, part.size, ink, index === parts.length - 1 ? 14 : 4);
+    });
+  }
 
   const omissions = audit.omissions ?? [];
   if (omissions.length === 0) {
-    write("No se identificaron omisiones críticas.", serif, 11, ink, 12);
+    write(
+      "No se detectaron omisiones en esta pasada. No equivale a ausencia de omisiones.",
+      serif,
+      11,
+      ink,
+      12,
+    );
   }
   omissions.forEach((omission, index) => {
     ensure(72);
@@ -166,7 +187,7 @@ export async function buildAuditPdf(audit: AuditResponse): Promise<Uint8Array<Ar
     3,
   );
   write(
-    "Procesamiento en memoria bajo políticas ZDR. Los datos se purgan al terminar la auditoría.",
+    "Los documentos se procesan en memoria y se eliminan automáticamente tras la auditoría. Para el análisis, el texto se envía a un proveedor de IA externo (OpenAI), que puede conservarlo temporalmente según sus políticas. Este informe es una herramienta de apoyo, no constituye asesoría legal y requiere revisión por un abogado.",
     sans,
     8,
     mute,

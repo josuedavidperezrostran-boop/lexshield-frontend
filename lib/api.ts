@@ -204,6 +204,26 @@ export type CompareResponse = {
   cambios: VersionChange[];
 };
 
+export type AuditIntegrity = {
+  version?: string;
+  status?: "complete" | "incomplete" | "unreliable";
+  status_label?: string;
+  message?: string;
+  total_candidates?: number;
+  verified?: number;
+  discarded?: number;
+  added_by_controls?: number;
+  discard_reasons?: {
+    malformed_item?: number;
+    failed_verification?: number;
+    quote_not_anchored?: number;
+  };
+  flags?: string[];
+  notes?: string[];
+  truncated?: boolean;
+  generated_at?: string;
+};
+
 export type AuditResponse = {
   filename: string;
   truncated: boolean;
@@ -213,4 +233,5 @@ export type AuditResponse = {
   metadata?: ContractMetadata;
   omissions?: MissingClause[];
   risks: RiskFinding[];
+  integrity?: AuditIntegrity;
 };

@@ -7,10 +7,10 @@ export const copy = {
   eyebrow: "Inteligencia jurídica profesional",
   hero: "Vea la cláusula que le costará — antes de firmar.",
   heroBody:
-    "LexShield es un auditor premium de riesgo contractual. Cargue un convenio y reciba una revisión en dos paneles de la exposición alta y media.",
+    "LexShield Audit es un auditor premium de riesgo contractual. Cargue un convenio y reciba una revisión en dos paneles de la exposición alta y media.",
   start: "Iniciar Professional",
   already: "Ya estoy suscrito",
-  pillarZdr: "Retención cero",
+  pillarZdr: "Procesamiento en memoria",
   pillarScan: "Revisión de nivel counsel",
   pillarScanBody:
     "El modelo revisa indemnidad, topes de responsabilidad, terminación, propiedad intelectual, confidencialidad, renovación automática y riesgos comerciales afines — solo altos y medios.",
@@ -23,7 +23,7 @@ export const copy = {
   sampleAction:
     "Sustituya por indemnidad recíproca y un tope ligado a los honorarios pagados en los doce meses previos.",
   stripeBilling: "Facturación Stripe",
-  plan: "LexShield Professional",
+  plan: "LexShield Audit Professional",
   pricingBody:
     "Se requiere una suscripción por Stripe Checkout antes del auditor. Los datos de la tarjeta permanecen en Stripe.",
   perkScans: "— Auditorías ilimitadas de PDF y DOCX",
@@ -51,9 +51,9 @@ export const copy = {
   legendOmission: "Omisión Crítica",
   legendOmissionBody:
     "Cláusulas esenciales faltantes que dejan al cliente desprotegido.",
-  zdr: "Procesamiento de IA de alta velocidad y asegurado. Los documentos se procesan en memoria bajo políticas estrictas de ejecución ZDR (retención cero). Los datos se purgan de forma automática tras la auditoría. Se requiere revisión humana.",
+  zdr: "Los documentos se procesan en memoria y se eliminan automáticamente tras la auditoría. Para el análisis, el texto se envía a un proveedor de IA externo (OpenAI), que puede conservarlo temporalmente según sus políticas. Este informe es una herramienta de apoyo, no constituye asesoría legal y requiere revisión por un abogado.",
   gate: "Acceso por suscripción",
-  gateTitle: "Se requiere LexShield Professional",
+  gateTitle: "Se requiere LexShield Audit Professional",
   gateBody:
     "$100 USD / mes (Nivel de lanzamiento fundador: aplique el código para su primer mes a $20). Introduzca FOUNDER80 en Stripe Checkout. Tras el pago volverá aquí con acceso.",
   proceed: "Continuar a Stripe Checkout",
@@ -88,7 +88,7 @@ export const copy = {
   findingsTitle: "Acciones y cláusulas alternativas",
   preparingPdf: "Preparando PDF…",
   downloadPdf: "Descargar informe PDF",
-  noRisks: "No se identificaron riesgos altos ni medios en esta pasada.",
+  noRisks: "No se detectaron riesgos en esta pasada. No interprete esto como ausencia de riesgos. Revisión humana obligatoria.",
   metadata: "Ficha técnica",
   parties: "Partes Involucradas",
   date: "Fecha del Contrato",
@@ -104,7 +104,7 @@ export const copy = {
   checking: "Comprobando la suscripción…",
   cancelled: "Pago cancelado",
   noCharge: "No se realizó ningún cargo",
-  stillGated: "LexShield Professional permanece cerrado hasta completar Stripe Checkout.",
+  stillGated: "LexShield Audit Professional permanece cerrado hasta completar Stripe Checkout.",
   returnCheckout: "Volver a Stripe Checkout",
   backHome: "Volver al inicio",
   confirming: "Confirmando su retainer",
@@ -117,7 +117,7 @@ export const copy = {
   demoFailed: "La demostración local no está disponible.",
   scanFailed: "La auditoría falló.",
   privacyBanner:
-    "Certificación de Privacidad Corporativa: Procesamiento exclusivo vía API Comercial bajo políticas estrictas de Zero Data Retention (ZDR). Los documentos se ejecutan 100% en memoria volátil y están legalmente protegidos contra el entrenamiento de modelos de IA públicos.",
+    "Los documentos se procesan en memoria y se eliminan automáticamente tras la auditoría. Para el análisis, el texto se envía a un proveedor de IA externo (OpenAI), que puede conservarlo temporalmente según sus políticas. Este informe es una herramienta de apoyo, no constituye asesoría legal y requiere revisión por un abogado.",
   tabAudit: "Auditoría",
   tabCompare: "Comparador de Versiones",
   wordAnchor: "Ancla Word",
