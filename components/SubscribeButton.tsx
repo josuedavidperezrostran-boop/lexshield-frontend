@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { startCheckout } from "@/lib/api";
+import { ApiError, openBillingPortal, startCheckout } from "@/lib/api";
 import { copy as t } from "@/lib/copy";
 
 type Props = {
@@ -17,16 +17,36 @@ export function SubscribeButton({
 }: Props) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [existing, setExisting] = useState(false);
   const locked = !allowed || busy;
 
   async function subscribe() {
     if (!allowed || busy) return;
     setBusy(true);
     setError(null);
+    setExisting(false);
     try {
       window.location.href = await startCheckout();
     } catch (err) {
-      setError(err instanceof Error ? err.message : t.checkoutFailed);
+      if (err instanceof ApiError && err.status === 409) {
+        // Never a second subscription: send the customer to manage the one they have.
+        setExisting(true);
+        setError(t.subscriptionExists);
+      } else if (err instanceof ApiError && err.status === 503) {
+        setError(t.stripeUnavailable);
+      } else {
+        setError(err instanceof Error ? err.message : t.checkoutFailed);
+      }
+      setBusy(false);
+    }
+  }
+
+  async function manage() {
+    setBusy(true);
+    try {
+      window.location.href = await openBillingPortal();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t.portalFailed);
       setBusy(false);
     }
   }
@@ -43,6 +63,16 @@ export function SubscribeButton({
         {busy ? t.redirecting : label ?? t.subscribe}
       </button>
       {error && <p className="text-xs text-high">{error}</p>}
+      {existing && (
+        <button
+          type="button"
+          onClick={manage}
+          disabled={busy}
+          className="rounded-sm border border-line px-3 py-2 text-sm text-ivory hover:border-gold disabled:opacity-50"
+        >
+          {t.manage}
+        </button>
+      )}
     </div>
   );
 }

@@ -1,15 +1,16 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ColorLegend } from "@/components/ColorLegend";
 import { LegalShield } from "@/components/LegalShield";
 import { SiteHeader } from "@/components/SiteHeader";
 import { VersionCompare } from "@/components/VersionCompare";
+import { resolveAccess, type AccessView, type BackendModel } from "@/lib/access";
 import {
   analyzeContract,
+  ApiError,
   clearToken,
   getBillingStatus,
-  getToken,
   openBillingPortal,
   unlockDemoAccess,
   type AuditIntegrity,
@@ -22,7 +23,7 @@ import { copy as t } from "@/lib/copy";
 import { downloadAuditReport } from "@/lib/reportPdf";
 
 export default function AuditorPage() {
-  const [authed, setAuthed] = useState<boolean | null>(null);
+  const [view, setView] = useState<AccessView | null>(null);
   const [demoMode, setDemoMode] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
@@ -35,27 +36,46 @@ export default function AuditorPage() {
   const [workspace, setWorkspace] = useState<"audit" | "compare">("audit");
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const hydrate = useCallback(async (isCancelled: () => boolean = () => false) => {
+    setView(null);
+    let backend: BackendModel = "unknown";
+    try {
+      const status = await getBillingStatus();
+      if (isCancelled()) return;
+      if (!status.checkout_required) {
+        setDemoMode(true);
+        setView({ kind: "workspace", state: null });
+        return;
+      }
+      backend = status.access_model === "stripe-subscription-v1" ? status.access_model : "legacy";
+    } catch {
+      // The subscription check below reports Stripe or network trouble on its own.
+    }
+    const next = await resolveAccess(backend);
+    if (!isCancelled()) setView(next);
+  }, []);
+
   useEffect(() => {
     let cancelled = false;
-    async function hydrate() {
-      try {
-        const status = await getBillingStatus();
-        if (cancelled) return;
-        if (!status.checkout_required) {
-          setDemoMode(true);
-          setAuthed(true);
-          return;
-        }
-        setAuthed(Boolean(getToken()));
-      } catch {
-        if (!cancelled) setAuthed(Boolean(getToken()));
-      }
-    }
-    hydrate();
+    hydrate(() => cancelled);
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [hydrate]);
+
+  const authed = view?.kind === "workspace" || view?.kind === "legacy_workspace";
+  const subscription = view?.kind === "workspace" ? view.state : null;
+
+  async function openPortal() {
+    setPortalBusy(true);
+    setError(null);
+    try {
+      window.location.href = await openBillingPortal();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t.portalFailed);
+      setPortalBusy(false);
+    }
+  }
 
   const segments = useMemo(
     () => (audit ? highlightSegments(audit.contract_text, audit.risks) : []),
@@ -86,11 +106,16 @@ export default function AuditorPage() {
       setAudit(result);
       setActiveId(result.risks[0]?.id ?? null);
     } catch (err) {
-      const message = err instanceof Error ? err.message : t.scanFailed;
-      setError(message);
-      if (message.toLowerCase().includes("subscription")) {
-        clearToken();
-        setAuthed(false);
+      if (err instanceof ApiError && err.status === 401) {
+        await hydrate();
+      } else if (err instanceof ApiError && err.status === 402) {
+        setView({ kind: "payment_required" });
+      } else if (err instanceof ApiError && err.status === 403) {
+        setView({ kind: "inactive" });
+      } else if (err instanceof ApiError && err.status === 503) {
+        setError(t.stripeUnavailable);
+      } else {
+        setError(err instanceof Error ? err.message : t.scanFailed);
       }
     } finally {
       setBusy(false);
@@ -100,13 +125,52 @@ export default function AuditorPage() {
   return (
     <div className="flex min-h-screen flex-col">
       <SiteHeader compact />
-      {authed === false && (
+      {view === null && <p className="mx-6 mt-6 text-sm text-muted">{t.checking}</p>}
+
+      {view?.kind === "unavailable" && (
+        <div className="mx-6 mt-6 rounded-md border border-line bg-panel p-8">
+          <p className="max-w-2xl text-ivory">{t.stripeUnavailable}</p>
+          <button
+            type="button"
+            onClick={() => hydrate()}
+            className="mt-4 rounded-sm border border-line px-3 py-2 text-sm text-ivory hover:border-gold"
+          >
+            {t.retry}
+          </button>
+        </div>
+      )}
+
+      {view?.kind === "payment_required" && (
+        <div className="mx-6 mt-6 rounded-md border border-gold/40 bg-panel p-8">
+          <h1 className="font-display text-4xl">{t.paymentRequiredTitle}</h1>
+          <p className="mt-3 max-w-2xl text-muted">{t.paymentRequiredBody}</p>
+          <div className="mt-6 flex flex-wrap items-center gap-4">
+            <button
+              type="button"
+              disabled={portalBusy}
+              onClick={openPortal}
+              className="rounded-sm bg-gold px-4 py-2 text-sm font-medium text-ink disabled:opacity-50"
+            >
+              {portalBusy ? t.openingPortal : t.updatePayment}
+            </button>
+            <button type="button" onClick={() => hydrate()} className="text-sm text-muted hover:text-ivory">
+              {t.retry}
+            </button>
+          </div>
+          {error && <p className="mt-3 text-sm text-high">{error}</p>}
+        </div>
+      )}
+
+      {(view?.kind === "signed_out" || view?.kind === "inactive") && (
         <div className="mx-6 mt-6 rounded-md border border-gold/40 bg-panel p-8">
           <p className="text-xs uppercase tracking-[0.3em] text-gold">{t.gate}</p>
           <h1 className="font-display mt-2 text-4xl">{t.gateTitle}</h1>
-          <p className="mt-3 max-w-2xl text-muted">{t.gateBody}</p>
+          <p className="mt-3 max-w-2xl text-muted">
+            {view.kind === "inactive" ? t.inactiveBody : t.gateBody}
+          </p>
           <div className="mt-6 max-w-xl space-y-3">
             <LegalShield label={t.proceed} />
+            {view.kind === "signed_out" && <p className="text-sm text-muted">{t.alreadySubscribed}</p>}
             {/* The backend refuses the billing bypass in production, so customers never see it. */}
             {process.env.NODE_ENV !== "production" && (
               <button
@@ -116,7 +180,7 @@ export default function AuditorPage() {
                   try {
                     await unlockDemoAccess();
                     setDemoMode(true);
-                    setAuthed(true);
+                    setView({ kind: "workspace", state: null });
                   } catch (err) {
                     setError(err instanceof Error ? err.message : t.demoFailed);
                   }
@@ -142,6 +206,15 @@ export default function AuditorPage() {
                 {demoMode ? t.demoPrefix : ""}
                 {t.zdr}
               </p>
+              {subscription?.cancel_at_period_end && (
+                <p className="mt-1 max-w-xl text-sm text-gold">
+                  {t.cancelScheduled}
+                  {subscription.current_period_end
+                    ? ` (${new Date(subscription.current_period_end * 1000).toLocaleDateString("es")})`
+                    : ""}
+                  .
+                </p>
+              )}
               </div>
               <ColorLegend />
             </div>
@@ -171,17 +244,7 @@ export default function AuditorPage() {
               <button
                 type="button"
                 disabled={portalBusy}
-                onClick={async () => {
-                  setPortalBusy(true);
-                  setError(null);
-                  try {
-                    const url = await openBillingPortal();
-                    window.location.href = url;
-                  } catch (err) {
-                    setError(err instanceof Error ? err.message : t.portalFailed);
-                    setPortalBusy(false);
-                  }
-                }}
+                onClick={openPortal}
                 className="rounded-sm border border-line px-3 py-2 text-sm text-ivory hover:border-gold disabled:opacity-50"
               >
                 {portalBusy ? t.openingPortal : t.manage}
@@ -190,7 +253,7 @@ export default function AuditorPage() {
                 type="button"
                 onClick={() => {
                   clearToken();
-                  setAuthed(false);
+                  setView({ kind: "signed_out" });
                   setAudit(null);
                   setDemoMode(false);
                 }}

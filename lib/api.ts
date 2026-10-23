@@ -36,6 +36,26 @@ function readError(data: { detail?: unknown }, fallback: string) {
   return fallback;
 }
 
+/** Keeps the HTTP status so callers can tell expired (401), payment (402), inactive (403),
+ * existing subscription (409) and temporary Stripe trouble (503) apart. */
+export class ApiError extends Error {
+  constructor(
+    message: string,
+    readonly status: number,
+  ) {
+    super(message);
+  }
+}
+
+function fail(response: Response, data: { detail?: unknown }, fallback: string): never {
+  throw new ApiError(readError(data, fallback), response.status);
+}
+
+function authHeaders(): Record<string, string> {
+  const token = getToken();
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
 function requireAccessToken(data: Record<string, unknown>): string {
   const token = data.access_token;
   if (typeof token !== "string" || !token.trim()) {
@@ -63,7 +83,45 @@ export type BillingStatus = {
   interval: string;
   checkout_required: boolean;
   stripe_configured: boolean;
+  /** Present on backends with Stripe-backed access ("stripe-subscription-v1"). */
+  access_model?: string;
 };
+
+/** Mirrors the backend: access comes from the Stripe subscription, not from the token. */
+export type SubscriptionState = {
+  status: string | null;
+  access: boolean;
+  payment_required: boolean;
+  has_subscription: boolean;
+  cancel_at_period_end: boolean;
+  current_period_end: number | null;
+};
+
+function readSubscription(value: unknown): SubscriptionState {
+  if (!value || typeof value !== "object" || typeof (value as SubscriptionState).access !== "boolean") {
+    throw new Error("El servidor no devolvió el estado de la suscripción.");
+  }
+  return value as SubscriptionState;
+}
+
+export async function getSubscriptionState(): Promise<SubscriptionState> {
+  const response = await fetch(`${API_URL}/billing/me`, { headers: authHeaders() });
+  const data = await readBody(response);
+  if (!response.ok) fail(response, data, "No se pudo leer la suscripción.");
+  return readSubscription(data);
+}
+
+/** Renews the stored token without Checkout or any charge. */
+export async function refreshAccess(): Promise<SubscriptionState> {
+  const response = await fetch(`${API_URL}/billing/refresh`, {
+    method: "POST",
+    headers: authHeaders(),
+  });
+  const data = await readBody(response);
+  if (!response.ok) fail(response, data, "No se pudo renovar la sesión.");
+  setToken(requireAccessToken(data));
+  return readSubscription(data.subscription);
+}
 
 export async function getBillingStatus(): Promise<BillingStatus> {
   const response = await fetch(`${API_URL}/billing/status`);
@@ -88,31 +146,25 @@ export async function unlockDemoAccess() {
 }
 
 export async function openBillingPortal(): Promise<string> {
-  const token = getToken();
   const response = await fetch(`${API_URL}/api/billing/portal`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
+    headers: { "Content-Type": "application/json", ...authHeaders() },
   });
   const data = await readBody(response);
-  if (!response.ok) {
-    throw new Error(readError(data, "No se pudo abrir el portal de cliente."));
-  }
+  if (!response.ok) fail(response, data, "No se pudo abrir el portal de cliente.");
   return data.portal_url as string;
 }
 
+/** Sends the stored token so the backend reuses the Stripe customer and refuses (409) a
+ * second subscription. Without a token the visitor is anonymous. */
 export async function startCheckout(): Promise<string> {
   const response = await fetch(`${API_URL}/billing/checkout`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...authHeaders() },
     body: JSON.stringify({}),
   });
   const data = await readBody(response);
-  if (!response.ok) {
-    throw new Error(readError(data, "No se pudo iniciar Stripe Checkout."));
-  }
+  if (!response.ok) fail(response, data, "No se pudo iniciar Stripe Checkout.");
   if (typeof data.checkout_url !== "string" || !data.checkout_url.startsWith("https://")) {
     throw new Error("El servidor no devolvió una URL de Stripe Checkout válida.");
   }
@@ -126,9 +178,7 @@ export async function verifyCheckout(sessionId: string) {
     body: JSON.stringify({ session_id: sessionId }),
   });
   const data = await readBody(response);
-  if (!response.ok) {
-    throw new Error(readError(data, "No se pudo verificar la suscripción."));
-  }
+  if (!response.ok) fail(response, data, "No se pudo verificar la suscripción.");
   setToken(requireAccessToken(data));
 }
 
@@ -143,9 +193,7 @@ export async function compareContracts(versionA: File, versionB: File) {
     body: form,
   });
   const data = await readBody(response);
-  if (!response.ok) {
-    throw new Error(readError(data, "No se pudo comparar las versiones."));
-  }
+  if (!response.ok) fail(response, data, "No se pudo comparar las versiones.");
   return data as CompareResponse;
 }
 
@@ -159,9 +207,7 @@ export async function analyzeContract(file: File) {
     body: form,
   });
   const data = await readBody(response);
-  if (!response.ok) {
-    throw new Error(readError(data, "La auditoría falló."));
-  }
+  if (!response.ok) fail(response, data, "La auditoría falló.");
   return data as AuditResponse;
 }
 
