@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import { copy as t } from "@/lib/copy";
-import { verifyCheckout } from "@/lib/api";
+import { ApiError, verifyCheckout } from "@/lib/api";
 
 function SuccessInner() {
   const params = useSearchParams();
@@ -20,7 +20,9 @@ function SuccessInner() {
     verifyCheckout(sessionId)
       .then(() => router.replace("/auditor"))
       .catch((err: unknown) => {
-        setError(err instanceof Error ? err.message : t.verifyFailed);
+        if (err instanceof ApiError && err.status === 410) setError(t.checkoutLinkExpired);
+        else if (err instanceof ApiError && err.status === 503) setError(t.stripeUnavailable);
+        else setError(err instanceof Error ? err.message : t.verifyFailed);
       });
   }, [params, router]);
 

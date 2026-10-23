@@ -134,4 +134,19 @@ export const copy = {
   changed: "Modificado entre versiones",
   alertLabel: "Alerta roja",
   compareFailed: "No se pudo comparar las versiones.",
+  stripeUnavailable:
+    "No pudimos confirmar su suscripción con Stripe en este momento. No es una cancelación ni un cobro: vuelva a intentarlo en unos minutos.",
+  retry: "Reintentar",
+  paymentRequiredTitle: "Actualice su método de pago",
+  paymentRequiredBody:
+    "El último cobro de su suscripción no se completó. Para seguir analizando contratos, actualice la tarjeta en el portal de Stripe. No contrate otra suscripción.",
+  updatePayment: "Actualizar método de pago",
+  inactiveBody: "Su suscripción de LexShield no está activa. Puede contratarla de nuevo.",
+  alreadySubscribed:
+    "¿Ya está suscrito y no ve el auditor? No vuelva a pagar. La recuperación de acceso desde otro navegador todavía no está disponible: contacte con LexShield desde el correo de su suscripción.",
+  subscriptionExists:
+    "Ya tiene una suscripción de LexShield. Adminístrela desde el portal en lugar de contratar otra.",
+  cancelScheduled: "Su suscripción se cancelará al final del período actual",
+  checkoutLinkExpired:
+    "Este enlace de pago ya no sirve para iniciar sesión. Si ya pagó, no vuelva a pagar.",
 };
