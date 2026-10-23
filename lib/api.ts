@@ -104,7 +104,7 @@ export async function openBillingPortal(): Promise<string> {
 }
 
 export async function startCheckout(): Promise<string> {
-  const response = await fetch("https://lexshield-backend.onrender.com/billing/checkout", {
+  const response = await fetch(`${API_URL}/billing/checkout`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({}),
@@ -113,7 +113,10 @@ export async function startCheckout(): Promise<string> {
   if (!response.ok) {
     throw new Error(readError(data, "No se pudo iniciar Stripe Checkout."));
   }
-  return data.checkout_url as string;
+  if (typeof data.checkout_url !== "string" || !data.checkout_url.startsWith("https://")) {
+    throw new Error("El servidor no devolvió una URL de Stripe Checkout válida.");
+  }
+  return data.checkout_url;
 }
 
 export async function verifyCheckout(sessionId: string) {
