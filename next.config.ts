@@ -1,10 +1,4 @@
 import type { NextConfig } from "next";
-import { loadEnvConfig } from "@next/env";
-import path from "path";
-
-// Load the repo-root .env into this Next.js process (in-memory).
-const projectRoot = path.resolve(__dirname, "..");
-loadEnvConfig(projectRoot);
 
 const LIVE_API_URL = "https://lexshield-backend.onrender.com";
 const DEFAULT_SITE_URL = "https://frontend-1-lex-shield2.vercel.app";

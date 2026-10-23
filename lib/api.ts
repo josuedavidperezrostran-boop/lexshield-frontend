@@ -25,7 +25,7 @@ async function readBody(response: Response): Promise<{ detail?: unknown } & Reco
   }
 }
 
-/** Stripe publishable key from the repo-root .env (safe for the browser). */
+/** Stripe publishable key (safe for the browser). */
 export const STRIPE_PUBLISHABLE_KEY =
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? "";
 
