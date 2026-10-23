@@ -107,21 +107,24 @@ export default function AuditorPage() {
           <p className="mt-3 max-w-2xl text-muted">{t.gateBody}</p>
           <div className="mt-6 max-w-xl space-y-3">
             <LegalShield label={t.proceed} />
-            <button
-              type="button"
-              className="text-sm text-muted underline-offset-4 hover:underline"
-              onClick={async () => {
-                try {
-                  await unlockDemoAccess();
-                  setDemoMode(true);
-                  setAuthed(true);
-                } catch (err) {
-                  setError(err instanceof Error ? err.message : t.demoFailed);
-                }
-              }}
-            >
-              {t.demo}
-            </button>
+            {/* The backend refuses the billing bypass in production, so customers never see it. */}
+            {process.env.NODE_ENV !== "production" && (
+              <button
+                type="button"
+                className="text-sm text-muted underline-offset-4 hover:underline"
+                onClick={async () => {
+                  try {
+                    await unlockDemoAccess();
+                    setDemoMode(true);
+                    setAuthed(true);
+                  } catch (err) {
+                    setError(err instanceof Error ? err.message : t.demoFailed);
+                  }
+                }}
+              >
+                {t.demo}
+              </button>
+            )}
             {error && <p className="text-sm text-high">{error}</p>}
           </div>
         </div>
