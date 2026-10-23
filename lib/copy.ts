@@ -58,7 +58,7 @@ export const copy = {
     "$100 USD / mes (Nivel de lanzamiento fundador: aplique el código para su primer mes a $20). Introduzca FOUNDER80 en Stripe Checkout. Tras el pago volverá aquí con acceso.",
   proceed: "Continuar a Stripe Checkout",
   demo: "Demostración local (sin cobro)",
-  workspace: "Espacio asegurado",
+  workspace: "Espacio de trabajo",
   demoPrefix: "La omisión local de cobro está activa. ",
   upload: "Cargar PDF o DOCX",
   scanning: "Analizando…",

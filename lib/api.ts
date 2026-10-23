@@ -36,6 +36,14 @@ function readError(data: { detail?: unknown }, fallback: string) {
   return fallback;
 }
 
+function requireAccessToken(data: Record<string, unknown>): string {
+  const token = data.access_token;
+  if (typeof token !== "string" || !token.trim()) {
+    throw new Error("El servidor no devolvió un token de acceso válido.");
+  }
+  return token;
+}
+
 export function getToken(): string | null {
   if (typeof window === "undefined") return null;
   return window.localStorage.getItem(TOKEN_KEY);
@@ -76,7 +84,7 @@ export async function unlockDemoAccess() {
   if (!response.ok) {
     throw new Error(readError(data, "La demostración local no está disponible."));
   }
-  setToken(data.access_token);
+  setToken(requireAccessToken(data));
 }
 
 export async function openBillingPortal(): Promise<string> {
@@ -118,7 +126,7 @@ export async function verifyCheckout(sessionId: string) {
   if (!response.ok) {
     throw new Error(readError(data, "No se pudo verificar la suscripción."));
   }
-  setToken(data.access_token);
+  setToken(requireAccessToken(data));
 }
 
 export async function compareContracts(versionA: File, versionB: File) {
