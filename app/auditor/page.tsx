@@ -5,7 +5,7 @@ import { ColorLegend } from "@/components/ColorLegend";
 import { LegalShield } from "@/components/LegalShield";
 import { SiteHeader } from "@/components/SiteHeader";
 import { VersionCompare } from "@/components/VersionCompare";
-import { resolveAccess, type AccessView } from "@/lib/access";
+import { resolveAccess, type AccessView, type BackendModel } from "@/lib/access";
 import {
   analyzeContract,
   ApiError,
@@ -38,6 +38,7 @@ export default function AuditorPage() {
 
   const hydrate = useCallback(async (isCancelled: () => boolean = () => false) => {
     setView(null);
+    let backend: BackendModel = "unknown";
     try {
       const status = await getBillingStatus();
       if (isCancelled()) return;
@@ -46,10 +47,11 @@ export default function AuditorPage() {
         setView({ kind: "workspace", state: null });
         return;
       }
+      backend = status.access_model === "stripe-subscription-v1" ? status.access_model : "legacy";
     } catch {
       // The subscription check below reports Stripe or network trouble on its own.
     }
-    const next = await resolveAccess();
+    const next = await resolveAccess(backend);
     if (!isCancelled()) setView(next);
   }, []);
 
@@ -61,7 +63,7 @@ export default function AuditorPage() {
     };
   }, [hydrate]);
 
-  const authed = view?.kind === "workspace";
+  const authed = view?.kind === "workspace" || view?.kind === "legacy_workspace";
   const subscription = view?.kind === "workspace" ? view.state : null;
 
   async function openPortal() {
@@ -105,7 +107,7 @@ export default function AuditorPage() {
       setActiveId(result.risks[0]?.id ?? null);
     } catch (err) {
       if (err instanceof ApiError && err.status === 401) {
-        setView(await resolveAccess());
+        await hydrate();
       } else if (err instanceof ApiError && err.status === 402) {
         setView({ kind: "payment_required" });
       } else if (err instanceof ApiError && err.status === 403) {

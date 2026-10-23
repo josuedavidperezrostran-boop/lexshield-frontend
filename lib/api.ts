@@ -83,6 +83,8 @@ export type BillingStatus = {
   interval: string;
   checkout_required: boolean;
   stripe_configured: boolean;
+  /** Present on backends with Stripe-backed access ("stripe-subscription-v1"). */
+  access_model?: string;
 };
 
 /** Mirrors the backend: access comes from the Stripe subscription, not from the token. */

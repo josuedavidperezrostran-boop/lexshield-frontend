@@ -12,9 +12,16 @@ import {
 export type AccessView =
   | { kind: "signed_out" }
   | { kind: "workspace"; state: SubscriptionState | null }
+  // Backend without Stripe-backed access (no access_model): it alone decides access from the
+  // old 30-day token. Not equivalent to "workspace": no subscription state, no renewal.
+  | { kind: "legacy_workspace" }
   | { kind: "payment_required" }
   | { kind: "inactive" }
   | { kind: "unavailable" };
+
+/** "stripe-subscription-v1" when /billing/status advertises it, "legacy" when /billing/status
+ * answered without it, "unknown" when /billing/status itself failed. */
+export type BackendModel = "stripe-subscription-v1" | "legacy" | "unknown";
 
 // Renew on page load once the token is a day old, so active customers rarely reach the
 // 7-day expiry. The backend still decides access from Stripe on every call.
@@ -47,16 +54,24 @@ async function renew(): Promise<AccessView> {
   }
 }
 
-export async function resolveAccess(): Promise<AccessView> {
+export async function resolveAccess(backend: BackendModel): Promise<AccessView> {
   if (!getToken()) return { kind: "signed_out" };
   let state: SubscriptionState;
   try {
     state = await getSubscriptionState();
   } catch (err) {
     if (err instanceof ApiError && err.status === 401) return renew();
-    // A backend without /billing/me predates Stripe-backed access and still checks the token
-    // itself on every call; keep the old behaviour instead of blocking everyone.
-    if (err instanceof ApiError && err.status === 404) return { kind: "workspace", state: null };
+    if (err instanceof ApiError && err.status === 404) {
+      if (backend === "legacy") {
+        // Only a backend that positively reports the old model gets the old behaviour.
+        console.warn("LexShield: backend has no Stripe-backed access; using legacy token access.");
+        return { kind: "legacy_workspace" };
+      }
+      // The backend says /billing/me exists (or could not be asked): a 404 is a deployment
+      // fault. Show the temporary error rather than hiding it behind the old flow.
+      console.error("LexShield: /billing/me returned 404 from a Stripe-backed backend.");
+      return { kind: "unavailable" };
+    }
     return { kind: "unavailable" };
   }
   const age = tokenAgeSeconds(getToken());
