@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { startCheckout } from "@/lib/api";
 import { copy as t } from "@/lib/copy";
 
 type Props = {
@@ -23,25 +24,7 @@ export function SubscribeButton({
     setBusy(true);
     setError(null);
     try {
-      const response = await fetch("https://lexshield-backend.onrender.com/billing/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({}),
-      });
-      const text = (await response.text()).trim();
-      if (!text || text.startsWith("<")) {
-        throw new Error("El servidor devolvió HTML en lugar de JSON. La URL de la API no apunta al backend.");
-      }
-      let data: { checkout_url?: string; detail?: string };
-      try {
-        data = JSON.parse(text) as { checkout_url?: string; detail?: string };
-      } catch {
-        throw new Error("La respuesta de la API no es JSON válido.");
-      }
-      if (!response.ok || !data.checkout_url) {
-        throw new Error(data.detail || t.checkoutFailed);
-      }
-      window.location.href = data.checkout_url;
+      window.location.href = await startCheckout();
     } catch (err) {
       setError(err instanceof Error ? err.message : t.checkoutFailed);
       setBusy(false);
