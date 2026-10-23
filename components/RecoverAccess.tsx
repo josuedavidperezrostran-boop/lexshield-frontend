@@ -1,16 +1,33 @@
 "use client";
 
-import { useState } from "react";
-import { ApiError, requestRecovery } from "@/lib/api";
+import { useEffect, useState } from "react";
+import { ApiError, getBillingStatus, requestRecovery } from "@/lib/api";
 import { copy as t } from "@/lib/copy";
 
 /** "Already subscribed?" form. Shows the same confirmation whatever the email, because the
- * backend never says whether an account exists. */
+ * backend never says whether an account exists. Hidden when the backend reports that it cannot
+ * send mail, so nobody is told a link is on its way when none can be. */
 export function RecoverAccess() {
   const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [available, setAvailable] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    getBillingStatus()
+      .then((status) => setAvailable(status.recovery_available === true))
+      .catch(() => setAvailable(false));
+  }, []);
+
+  if (available === null) return null;
+  if (!available) {
+    return (
+      <div className="mt-6 max-w-xl rounded-sm border border-line px-4 py-4">
+        <p className="text-sm text-ivory">{t.recoveryNotAvailable}</p>
+      </div>
+    );
+  }
 
   async function submit(event: React.FormEvent) {
     event.preventDefault();

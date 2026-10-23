@@ -155,6 +155,15 @@ export const copy = {
   recoverHeading: "Acceso a LexShield",
   recoverLinkInvalid: "Este enlace no es válido o ya caducó. Pida uno nuevo.",
   recoverNoSubscription: "Esta cuenta ya no tiene una suscripción de LexShield.",
+  recoveryNotAvailable:
+    "¿Ya está suscrito y no ve el auditor? No vuelva a pagar. La recuperación de acceso por correo todavía no está disponible: contacte con LexShield desde el correo de su suscripción.",
+  newCheckoutUnavailable:
+    "Las altas nuevas no están disponibles en este momento. No se ha realizado ningún cargo.",
+  subscribeEmailPrompt:
+    "Escriba su correo. Le enviaremos un enlace para continuar al pago (o para entrar, si ya está suscrito).",
+  subscribeEmailSend: "Enviar enlace",
+  subscribeEmailSent:
+    "Revise su correo: le enviamos un enlace para continuar. Caduca en 15 minutos y funciona una sola vez.",
   subscriptionExists:
     "Ya tiene una suscripción de LexShield. Adminístrela desde el portal en lugar de contratar otra.",
   cancelScheduled: "Su suscripción se cancelará al final del período actual",

@@ -85,6 +85,9 @@ export type BillingStatus = {
   stripe_configured: boolean;
   /** Present on backends with Stripe-backed access ("stripe-subscription-v1"). */
   access_model?: string;
+  /** Email flows the backend can actually run now (mail provider, store, Stripe, price). */
+  recovery_available?: boolean;
+  new_checkout_available?: boolean;
 };
 
 /** Mirrors the backend: access comes from the Stripe subscription, not from the token. */
@@ -146,6 +149,36 @@ export async function confirmRecovery(code: string): Promise<SubscriptionState> 
   if (!response.ok) fail(response, data, "No se pudo confirmar el enlace.");
   setToken(requireAccessToken(data));
   return readSubscription(data.subscription);
+}
+
+/** First step for a visitor without a session: mails a link to continue. Same answer for every
+ * email (a subscriber gets a sign-in link instead of a way to pay). */
+export async function startEmailCheckout(email: string): Promise<void> {
+  const response = await fetch(`${API_URL}/billing/checkout/start`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+  const data = await readBody(response);
+  if (!response.ok) fail(response, data, "No se pudo enviar el enlace.");
+}
+
+/** Exchanges the emailed code for a session; returns the Stripe Checkout URL, or null when the
+ * email already had a subscription and the visitor is simply signed in. */
+export async function confirmEmailCheckout(code: string): Promise<string | null> {
+  const response = await fetch(`${API_URL}/billing/checkout/confirm`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ code }),
+  });
+  const data = await readBody(response);
+  if (!response.ok) fail(response, data, "No se pudo confirmar el enlace.");
+  setToken(requireAccessToken(data));
+  if (data.checkout_url == null) return null;
+  if (typeof data.checkout_url !== "string" || !data.checkout_url.startsWith("https://")) {
+    throw new Error("El servidor no devolvió una URL de Stripe Checkout válida.");
+  }
+  return data.checkout_url;
 }
 
 /** Revokes this session on the server, then forgets it here even if the server is unreachable. */
