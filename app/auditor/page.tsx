@@ -3,15 +3,16 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ColorLegend } from "@/components/ColorLegend";
 import { LegalShield } from "@/components/LegalShield";
+import { RecoverAccess } from "@/components/RecoverAccess";
 import { SiteHeader } from "@/components/SiteHeader";
 import { VersionCompare } from "@/components/VersionCompare";
 import { resolveAccess, type AccessView, type BackendModel } from "@/lib/access";
 import {
   analyzeContract,
   ApiError,
-  clearToken,
   getBillingStatus,
   openBillingPortal,
+  signOut,
   unlockDemoAccess,
   type AuditIntegrity,
   type AuditResponse,
@@ -170,7 +171,7 @@ export default function AuditorPage() {
           </p>
           <div className="mt-6 max-w-xl space-y-3">
             <LegalShield label={t.proceed} />
-            {view.kind === "signed_out" && <p className="text-sm text-muted">{t.alreadySubscribed}</p>}
+            {view.kind === "signed_out" && <RecoverAccess />}
             {/* The backend refuses the billing bypass in production, so customers never see it. */}
             {process.env.NODE_ENV !== "production" && (
               <button
@@ -251,8 +252,8 @@ export default function AuditorPage() {
               </button>
               <button
                 type="button"
-                onClick={() => {
-                  clearToken();
+                onClick={async () => {
+                  await signOut();
                   setView({ kind: "signed_out" });
                   setAudit(null);
                   setDemoMode(false);
