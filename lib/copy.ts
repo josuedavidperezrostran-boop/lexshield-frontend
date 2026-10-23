@@ -142,8 +142,19 @@ export const copy = {
     "El último cobro de su suscripción no se completó. Para seguir analizando contratos, actualice la tarjeta en el portal de Stripe. No contrate otra suscripción.",
   updatePayment: "Actualizar método de pago",
   inactiveBody: "Su suscripción de LexShield no está activa. Puede contratarla de nuevo.",
-  alreadySubscribed:
-    "¿Ya está suscrito y no ve el auditor? No vuelva a pagar. La recuperación de acceso desde otro navegador todavía no está disponible: contacte con LexShield desde el correo de su suscripción.",
+  recoverTitle:
+    "¿Ya está suscrito y no ve el auditor? No vuelva a pagar: le enviamos un enlace de acceso al correo de su suscripción.",
+  recoverPlaceholder: "correo@despacho.com",
+  recoverSend: "Enviar enlace",
+  recoverSending: "Enviando…",
+  recoverSent:
+    "Si ese correo tiene una suscripción de LexShield, recibirá un enlace en unos minutos. Caduca en 15 minutos y funciona una sola vez.",
+  recoverTooMany: "Demasiados intentos. Vuelva a intentarlo más tarde.",
+  recoverUnavailable: "La recuperación de acceso no está disponible en este momento. Inténtelo más tarde.",
+  recoverInvalidEmail: "Escriba un correo válido.",
+  recoverHeading: "Acceso a LexShield",
+  recoverLinkInvalid: "Este enlace no es válido o ya caducó. Pida uno nuevo.",
+  recoverNoSubscription: "Esta cuenta ya no tiene una suscripción de LexShield.",
   subscriptionExists:
     "Ya tiene una suscripción de LexShield. Adminístrela desde el portal en lugar de contratar otra.",
   cancelScheduled: "Su suscripción se cancelará al final del período actual",

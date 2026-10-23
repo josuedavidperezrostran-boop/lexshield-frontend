@@ -123,6 +123,44 @@ export async function refreshAccess(): Promise<SubscriptionState> {
   return readSubscription(data.subscription);
 }
 
+/** Asks for a one-time sign-in link. The answer is the same whether or not the email has a
+ * subscription, so this never tells the caller which it was. */
+export async function requestRecovery(email: string): Promise<void> {
+  const response = await fetch(`${API_URL}/billing/recover`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+  const data = await readBody(response);
+  if (!response.ok) fail(response, data, "No se pudo enviar el enlace.");
+}
+
+/** Exchanges the code from the emailed link for a new session. Works once. */
+export async function confirmRecovery(code: string): Promise<SubscriptionState> {
+  const response = await fetch(`${API_URL}/billing/recover/confirm`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ code }),
+  });
+  const data = await readBody(response);
+  if (!response.ok) fail(response, data, "No se pudo confirmar el enlace.");
+  setToken(requireAccessToken(data));
+  return readSubscription(data.subscription);
+}
+
+/** Revokes this session on the server, then forgets it here even if the server is unreachable. */
+export async function signOut(): Promise<void> {
+  try {
+    if (getToken()) {
+      await fetch(`${API_URL}/billing/logout`, { method: "POST", headers: authHeaders() });
+    }
+  } catch {
+    // Offline: the token is still dropped below; it expires on its own.
+  } finally {
+    clearToken();
+  }
+}
+
 export async function getBillingStatus(): Promise<BillingStatus> {
   const response = await fetch(`${API_URL}/billing/status`);
   const data = await readBody(response);
