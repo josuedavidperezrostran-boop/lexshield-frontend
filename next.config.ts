@@ -26,9 +26,6 @@ function resolveApiUrl(): string {
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
-  typescript: {
-    ignoreBuildErrors: true,
-  },
   env: {
     NEXT_PUBLIC_SITE_URL: resolveSiteUrl(),
     NEXT_PUBLIC_API_URL: resolveApiUrl(),
